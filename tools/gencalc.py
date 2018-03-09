@@ -1,8 +1,8 @@
 '''
 Генерация расчета с использование модуля Pansym
 '''
-from tools.textblocks import *
-from tools.rotate_foilpoints import *
+from textblocks import *
+from rotate_foilpoints import *
 import time
 
 if __name__ == '__main__':

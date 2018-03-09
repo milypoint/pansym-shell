@@ -23,10 +23,10 @@ from math import *
 
 def rotDots(fi, infile = False):	
 
-	data_dir = getProjectDir() + r'\data' #файл с данными
+	data_dir = getProjectDir() + 'data\\' #файл с данными
 	input_filename = "aerofoil_in.dat" #входной файл с координатами точек профиля
 
-	with open(data_dir + '\\' + input_filename, 'r') as f:
+	with open(data_dir + input_filename, 'r') as f:
 		read_data = f.read() #чтение файла в массив
 
 	read_data = read_data.replace('-', ' -').replace('\n', '').split(' ') #преобразования массива входных данных в список по разделителю " "
@@ -65,7 +65,7 @@ def rotDots(fi, infile = False):
 	new_data = new_data.replace(' -', '-') #удаляем лишние пробелы перед знаком минус
 
 	if (infile == True):
-		with open(data_dir + '\\' + input_filename[:-4] + '_output.dat', 'w') as f:
+		with open(data_dir + input_filename[:-4] + '_output.dat', 'w') as f:
 			f.write(new_data)
 	else:
 		return new_data
@@ -76,7 +76,7 @@ def getProjectDir():
 	'''
 	project_name = 'pansym-shell'
 	pdir = os.path.dirname(os.path.abspath(__file__)) 
-	return pdir.split(project_name)[0] + project_name
+	return pdir.split(project_name)[0] + project_name + '\\'
 
 
 if __name__ == '__main__':

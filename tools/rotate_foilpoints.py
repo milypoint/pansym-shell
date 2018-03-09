@@ -25,7 +25,7 @@ def rotDots(fi, data_dir, infile = False):
 
 	#cur_dir = os.path.dirname(os.path.abspath(__file__)) #директория расположение исполняемого файла
 	#data_dir = '\data' #файл с данными
-	input_filename = "aerofoil_in.txt" #входной файл с координатами точек профиля
+	input_filename = "aerofoil_in.dat" #входной файл с координатами точек профиля
 
 	with open(data_dir + '\\' + input_filename, 'r') as f:
 		read_data = f.read() #чтение файла в массив
@@ -66,7 +66,7 @@ def rotDots(fi, data_dir, infile = False):
 	new_data = new_data.replace(' -', '-') #удаляем лишние пробелы перед знаком минус
 
 	if (infile == True):
-		with open(data_dir + '\\' + input_filename[:-4] + '_output.txt', 'w') as f:
+		with open(data_dir + '\\' + input_filename[:-4] + '_output.dat', 'w') as f:
 			f.write(new_data)
 	else:
 		return new_data

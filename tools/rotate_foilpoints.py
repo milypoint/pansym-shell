@@ -21,10 +21,9 @@
 import os
 from math import *
 
-def rotDots(fi, data_dir, infile = False):	
+def rotDots(fi, infile = False):	
 
-	#cur_dir = os.path.dirname(os.path.abspath(__file__)) #директория расположение исполняемого файла
-	#data_dir = '\data' #файл с данными
+	data_dir = getProjectDir() + r'\data' #файл с данными
 	input_filename = "aerofoil_in.dat" #входной файл с координатами точек профиля
 
 	with open(data_dir + '\\' + input_filename, 'r') as f:
@@ -70,6 +69,14 @@ def rotDots(fi, data_dir, infile = False):
 			f.write(new_data)
 	else:
 		return new_data
+
+def getProjectDir():
+	'''
+	Возвращает полный путь к корню проекта 
+	'''
+	project_name = 'pansym-shell'
+	pdir = os.path.dirname(os.path.abspath(__file__)) 
+	return pdir.split(project_name)[0] + project_name
 
 
 if __name__ == '__main__':

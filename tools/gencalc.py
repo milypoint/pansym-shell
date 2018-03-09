@@ -5,21 +5,20 @@ from textblocks import *
 from rotate_foilpoints import *
 import time
 
-if __name__ == '__main__':
+def gencalc():
 
 	bool_do_calc = True #Нужно ли делать основной расчет (использовать для отладки)
 
 	Mach = 0.06 #число Маха
-
 	b = 0.25 #Хорда крыла (в даной задаче для переднего и заднего одинакова)
 	x_1 = 0.5 #Положение передней кропки первого крыла по оси Х
 	x_2 = 1.5 #Положение передней кропки второго крыла по оси Х
 	y_1 = 0.125 #Положение передней кропки второго крыла по оси У
 	y_2 = - y_1
 	f_wingspan = 5 * b #Размах переднего крыла
+	centerOfMass = { 'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*0.45 + x_1 + 0.25*b, 'y' : 0, 'z' : 0}
 
 	#ranges:
-	#e_wingspan = [x / 100 for x in range(int(f_wingspan * 100), int(f_wingspan*160), 10)]
 	e_wingspan = [ f_wingspan * x / 100 for x in range(100, 165, 5)]
 	rudders_ratio = [x for x in range(30, 90, 20)] 
 	where_rudders = [x for x in range(1, 3)]
@@ -31,8 +30,6 @@ if __name__ == '__main__':
 	print('Ruders position: ' + str(where_rudders))
 	print('Delta: ' + str(delta) + '\n')
 
-	centerOfMass = { 'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*0.45 + x_1 + 0.25*b, 'y' : 0, 'z' : 0}
-
 	calc_count = 0
 	for w_r in where_rudders:
 		for r_r in rudders_ratio:
@@ -43,7 +40,7 @@ if __name__ == '__main__':
 	print('Cycles count: ' + str(calc_count))
 	
 	calc_count = 1
-	time_count = time.clock() #инициализируемсчетчик времени
+	time_count = time.clock() #инициализируем счетчик времени
 	for w_r in where_rudders:
 		for r_r in rudders_ratio:
 			for e_w in e_wingspan:
@@ -167,9 +164,10 @@ if __name__ == '__main__':
 					Далее запишем текстовый блок в соответсвующий файл
 					'''
 					if bool_do_calc == True:
-						pansym_dir = '\\PANSYM'
-						cur_dir = os.path.dirname(os.path.abspath(__file__))
-						data_dir = '\\output_files'
+						project_dir = getProjectDir()
+						pansym_dir = project_dir + r'tools\PANSYM'
+						ou_dir = project_dir + r'\data\ou_files'
+
 						#Сгенерируем имя файла, которое содержит параметры расчета
 						file_name = 'rudpos=%(where)s_backwingspan=%(span)s_ruderratio=%(ratio)s_delta=%(delta)s'
 						data = dict()
@@ -179,23 +177,23 @@ if __name__ == '__main__':
 						data['delta'] = str(d) #угол отклонения руля
 
 						#запись текстового блока в файл для расчета
-						with open(cur_dir + pansym_dir + '\\' + 'tandem' + '.in', 'w') as f:
+						with open(pansym_dir + '\\' + 'tandem' + '.in', 'w') as f:
 							f.write(sumtext) #запись текстового блока в файл 
 
 						#запускаем модуль пансима
 						import subprocess
-						filepath = cur_dir + "/PANSYM/run_pan.bat"
-						p = subprocess.Popen(filepath, shell=True, stdout = subprocess.PIPE)
+						batfile = pansym_dir + r"\run_pan.bat"
+						p = subprocess.Popen(batfile, shell=True, stdout = subprocess.PIPE)
 						stdout, stderr = p.communicate()
 						print(p.returncode) # is 0 if success
 
 						#Копируем файл с результатами в соответствующую папку
-						with open(cur_dir + pansym_dir + '\\' + 'tandem' + '.ou', 'r') as f:
+						with open(pansym_dir + r'\tandem.ou', 'r') as f:
 							out_data = f.read() #чтение из выходного файла *.ou 
 
-						os.remove(cur_dir + pansym_dir + '\\' + 'tandem' + '.ou')#удаляем на всякий случай файл с результатом расчета
+						os.remove(pansym_dir + r'\tandem.ou')#удаляем на всякий случай файл с результатом расчета
 
-						with open(cur_dir + data_dir + '\\' + file_name % data + '.ou', 'w') as f:
+						with open(ou_dir + '\\' + file_name % data + '.ou', 'w') as f:
 							f.write(out_data) #запись текстового блока в файл в соответствующей директории со всеми выходными файлами
 
 						#Счетчики:
@@ -203,3 +201,8 @@ if __name__ == '__main__':
 						time_count = time.clock()
 						print('Cycle number: ' + str(calc_count))
 						calc_count += 1
+
+if __name__ == '__main__':
+	gencalc()
+
+	

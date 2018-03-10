@@ -3,6 +3,9 @@ from os import listdir
 from os.path import isfile, join
 import re #Регулярные выражения для работы со строковыми шаблонами
 import glob
+from rotate_foilpoints import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 def fileNameDecode(fname):
 	'''
@@ -20,7 +23,7 @@ def isChangeData(cur_data, last_data):
 
 if __name__ == '__main__':
 
-	oupath = os.path.dirname(os.path.abspath(__file__)) + '\\output_files\\' #папка с выходными файлами
+	oupath = getProjectDir() + 'data\\ou_files\\' #папка с выходными файлами
 	filelist = [f for f in listdir(oupath) if isfile(join(oupath, f))] #получаем список файлов
 	filelist.sort(key=lambda x: os.path.getctime(oupath + x)) #Сортируем по дате создания
 	
@@ -149,9 +152,6 @@ if __name__ == '__main__':
 			front.append(line[1:])
 		else:
 			back.append(line[1:])
-
-	import numpy as np
-	import matplotlib.pyplot as plt
 	
 	plt.figure(1)
 	plt.xlabel('l2/l1')
@@ -192,16 +192,17 @@ if __name__ == '__main__':
 		y2.append(line[3])
 		prev_ratio = line[1]
 
+	data_dir = getProjectDir() + 'data\\images\\'
 	#
 	plt.figure(1)
 	plt.plot(x, y, 'ro', x, y, 'k')
 	plt.annotate(str(line[1])+'%', xy=(x[-1], y[-1]), xytext=(x[-1]+abs(x[-1]*0.01), y[-1]+abs(y[-1]*0.01)))
-	plt.savefig('ox1_img.png')
+	plt.savefig(data_dir + 'ox1_img.png')
 	#
 	plt.figure(2)
 	plt.plot(x, y2, 'ro', x, y2, 'k')
 	plt.annotate(str(line[1])+'%', xy=(x[-1], y2[-1]), xytext=(x[-1]+abs(x[-1]*0.01), y2[-1]+abs(y2[-1]*0.01)))
-	plt.savefig('oz1_img.png')
+	plt.savefig(data_dir + 'oz1_img.png')
 
 	plt.figure(3)	
 	plt.xlabel('l2/l1')
@@ -246,9 +247,9 @@ if __name__ == '__main__':
 	plt.figure(3)
 	plt.plot(x, y, 'ro', x, y, 'k')
 	plt.annotate(str(line[1])+'%', xy=(x[-1], y[-1]), xytext=(x[-1]+abs(x[-1]*0.01), y[-1]+abs(y[-1]*0.01)))
-	plt.savefig('ox2_img.png')
+	plt.savefig(data_dir + 'ox2_img.png')
 	#
 	plt.figure(4)
 	plt.plot(x, y2, 'ro', x, y2, 'k')
 	plt.annotate(str(line[1])+'%', xy=(x[-1], y2[-1]), xytext=(x[-1]+abs(x[-1]*0.01), y2[-1]+abs(y2[-1]*0.01)))
-	plt.savefig('oz2_img.png')
+	plt.savefig(data_dir + 'oz2_img.png')

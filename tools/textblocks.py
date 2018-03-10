@@ -1,5 +1,7 @@
 """Содержит класы с шаблонами текстовых блоков для генерации *.IN файла для PANSYM"""
 
+import numpy as np
+
 class TextBlock():
 	"""Базовый класс для текстового блока"""
 
@@ -43,21 +45,22 @@ class FuselagBlock(TextBlock):
 <XM   ><YM   ><ZM   >
 0.2     0.2    0.2 """
 
+
 class WingBlock(TextBlock):
 	"""--- %(name)-10s ---
-%(ne)-3s 2  0 %(ns)-3s-16 1 %(ni)-3s                        0   0        1  
+%(ne)-3s 2  0 %(ns)-3s-16 1  20                        0   0        1  
  NE IT IB NS NU II NI UI NL IC IM IP IM ICO   ICOE
 < NP  >< Xm  >< Ym  >< Zm  ><Ch m >< Fi  >
  1     %(Xm)-7s%(Ym)-7s%(Zm1)-7s%(Ch)-7s%(Fi)-7s
 
  1     %(Xm)-7s%(Ym)-7s%(Zm2)-7s%(Ch)-7s%(Fi)-7s
 < z   ><     ><     ><     ><     ><     ><     ><     ><     ><     >
-0.0    0.0555  0.1111 0.1666 0.2222 0.2777 0.3333 0.3888 0.4444 0.5000
-0.5555 0.6111  0.6666 0.7222 0.7777 0.8333 0.8888 0.9444 1.0"""
+0.     0.0526 0.1052 0.1578 0.2105 0.2631 0.3157 0.3684 0.4210 0.4736 
+0.5263 0.5789 0.6315 0.6842 0.7368 0.7894 0.8421 0.8947 0.9473 1.     """
 
 class WingBlock2(TextBlock):
 	"""--- %(name)s ---
-%(ne)-3s 2  0 %(ns)-3s-16 1 %(ni)-3s                        0   0        1  
+%(ne)-3s 2  0 %(ns)-3s-16 1  20                        0   0        1  
  NE IT IB NS NU II NI UI NL IC IM IP IM ICO   ICOE
 < NP  >< Xm  >< Ym  >< Zm  ><Ch m >< Fi  >
  1     %(Xm)-7s%(Ym)-7s%(Zm0)-7s%(Ch)-7s%(Fi)-7s
@@ -68,8 +71,8 @@ class WingBlock2(TextBlock):
 
  2     %(Xm)-7s%(Ym)-7s%(Zm2)-7s%(Ch)-7s%(Fi)-7s
 < z   ><     ><     ><     ><     ><     ><     ><     ><     ><     >
-0.0    0.0555  0.1111 0.1666 0.2222 0.2777 0.3333 0.3888 0.4444 0.5000
-0.5555 0.6111  0.6666 0.7222 0.7777 0.8333 0.8888 0.9444 1.0"""
+0.     0.0526 0.1052 0.1578 0.2105 0.2631 0.3157 0.3684 0.4210 0.4736 
+0.5263 0.5789 0.6315 0.6842 0.7368 0.7894 0.8421 0.8947 0.9473 1.     """
   
 
 class EndBlock(TextBlock):
@@ -95,3 +98,20 @@ def doLenTiny3(s): #обрезает строку в 3 знака
 	else:
 		return s
 
+def genNI(): #генерирует текст с разбивкой сетки по розмаху
+		ni_arr = np.linspace(0, 1, 20)
+		ni_text = ''
+		tamplate = '%-7s'
+		cur_i = 0
+		for item in ni_arr:
+			if cur_i == 10:
+				ni_text += '\n'
+				cur_i = 0
+			ni_text += tamplate % doLenTiny7(item)[:-1]
+			cur_i += 1
+		return ni_text
+
+
+if __name__ == '__main__':
+	
+	print(genNI())

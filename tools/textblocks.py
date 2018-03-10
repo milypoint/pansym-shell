@@ -91,6 +91,13 @@ def doLenTiny7(s): #обрезает строку в 7 знаков
 	else:
 		return s
 
+def doLenTiny6(s): #обрезает строку в 7 знаков
+	s = str(s)
+	if len(s) > 6:
+		return s[:6]
+	else:
+		return s
+
 def doLenTiny3(s): #обрезает строку в 3 знака
 	s = str(s)
 	if len(s) > 3:
@@ -98,8 +105,9 @@ def doLenTiny3(s): #обрезает строку в 3 знака
 	else:
 		return s
 
-def genNI(): #генерирует текст с разбивкой сетки по розмаху
-		ni_arr = np.linspace(0, 1, 20)
+def genNI(ni): #генерирует текст с разбивкой сетки по розмаху
+		ni_arr = np.linspace(0, 1, ni)
+		print(ni_arr)
 		ni_text = ''
 		tamplate = '%-7s'
 		cur_i = 0
@@ -107,11 +115,11 @@ def genNI(): #генерирует текст с разбивкой сетки �
 			if cur_i == 10:
 				ni_text += '\n'
 				cur_i = 0
-			ni_text += tamplate % doLenTiny7(item)[:-1]
+			ni_text += tamplate % doLenTiny6(item)
 			cur_i += 1
 		return ni_text
 
 
 if __name__ == '__main__':
 	
-	print(genNI())
+	print(genNI(37))

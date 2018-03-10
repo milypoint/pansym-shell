@@ -80,4 +80,4 @@ def getProjectDir():
 
 
 if __name__ == '__main__':
-	print(rotDots(0, r'D:\Projects\pansym-shell\data'))
+	print(rotDots(10, r'D:\Projects\pansym-shell\data'))

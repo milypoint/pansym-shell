@@ -17,6 +17,12 @@ def fileNameDecode(fname):
 	return m.group('where'), float(m.group('span')), float(m.group('ratio')), float(m.group('delta'))
 
 def isChangeData(cur_data, last_data):
+	'''
+	Функция для проверки соответсвия данных словаря last_data с данным словаря cur_data.
+	Словарь last_data является "подсловарём" cur_data.
+
+	Возвращает True если данные не совпадают.
+	'''
 	for key, value in last_data.items():
 		if cur_data[key] != value: return True
 	return False
@@ -102,11 +108,6 @@ if __name__ == '__main__':
 			new_item['kz'] = round(np.polyfit(d, mz, 1)[0], 4) 
 			new_test_data.append(new_item)
 
-	'''
-	!!!Попробовать использовать коэффициенты в ствязанной системе координат
-	'''
-	#for item in new_test_data:
-		#print(item)
 	'''
 	Проходим по элементам словаря и заменяем его конечную часть на словарь с масивами,
 	которые содержат углы отклонения рулей, коэффициенты моментов и расчитаные еффективности руля высоты и элерона

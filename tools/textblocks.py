@@ -41,6 +41,10 @@ def genNI(ni_count, type_gen='linear', sym=False): #генерирует тек�
 
 	elif type_gen == 'cos':
 		#генерируем список точек для косинусного распределения сетки
+		if sym == False: #если распределение несиметричное
+			return [round(math.cos(x), 4) for x in np.linspace(math.pi/2, 0, ni_count)]
+		else: #если распределение симетричное
+			return [round(0.5 + math.cos(x)/2, 4) for x in np.linspace(math.pi, 0, ni_count)]
 
 def genTextNI(ni_arr):
 	'''

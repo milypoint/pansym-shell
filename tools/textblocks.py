@@ -1,7 +1,7 @@
 """Содержит класы с шаблонами текстовых блоков для генерации *.IN файла для PANSYM"""
 
 import numpy as np
-
+import math
 class TextBlock():
 	"""Базовый класс для текстового блока"""
 
@@ -105,21 +105,72 @@ def doLenTiny3(s): #обрезает строку в 3 знака
 	else:
 		return s
 
-def genNI(ni): #генерирует текст с разбивкой сетки по розмаху
-		ni_arr = np.linspace(0, 1, ni)
-		print(ni_arr)
-		ni_text = ''
-		tamplate = '%-7s'
-		cur_i = 0
-		for item in ni_arr:
-			if cur_i == 10:
-				ni_text += '\n'
-				cur_i = 0
-			ni_text += tamplate % doLenTiny6(item)
-			cur_i += 1
-		return ni_text
+def genNI(ni_count, type_gen='linear', sym=False): #генерирует текст с разбивкой сетки по розмаху
+	'''
+	Функция генерирует массив с относительными координатами точек, 
+	которые определяют распределение сетки по размаху на текущем участке крыла.
+
+	type_gen='linear' - линейное распределение (по умолчанию)
+	type_gen='cos' - распределение по косинусу
+	
+	Симметрия для нелинейного распределения:
+	sym=False - распределение без симетрии (по умолчанию)
+	sym=True - распределение симетрично относительно середины
+	'''
+	if type_gen == 'linear':
+		return np.linspace(0, 1, ni_count)
+
+	elif type_gen == 'cos':
+		list_angles = [x for x in np.linspace(math.pi/2, 0 if sum==False else -math.pi/2, ni_count)]
+		ni_arr = []
+		for item in list_angles:
+			if item == list_angles[0]:
+				last = math.cos(item)
+				ni_arr.append(round(math.cos(item), 4))
+			else:
+				ni_arr.append(round(math.cos(item), 4))
+				last = math.cos(item)
+		if sym == False:
+			return ni_arr
+		else:
+			#обрезаем массив по середине (включая середину для непарного количества элементов)
+			ni_arr = ni_arr[:int(len(ni_arr)/2) + (1 if ni_count%2 != 0 else 0)]
+			#делим надвое каждый элемент массива
+			ni_arr = [x/2 for x in ni_arr]
+			#добавлям к массиву "симметричную" часть
+			ni_arr += [0.5 + 0.5 - x for x in ni_arr[::-1]]
+			#возвращаем значение (если непарное кол-во элементов - удаляем дублирущийся элемент в середине массива)
+			return(ni_arr if ni_count%2==0 else ni_arr[:int(len(ni_arr)/2)] + ni_arr[int(len(ni_arr)/2)+1:])
+
+def genTextNI(ni_arr):
+	'''
+	Функция генерирует текстовый блок с относительными координатами точек, 
+	определяющих распределение сетки по размаху текущего участка крыла.
+
+	Вход:
+
+	ni_arr - массив точек
+
+	Выход:
+
+	Текстовый блок удовлетворяющий синтаксис Pansym
+	'''
+	text = ''
+	tamplate = '%-7s'
+	cur_i = 0
+	for item in ni_arr:
+		if cur_i == 10:
+			text += '\n'
+			cur_i = 0
+		text += tamplate % doLenTiny6(item)
+		cur_i += 1
+	return text
 
 
 if __name__ == '__main__':
 	
-	print(genNI(37))
+	print(genTextNI(genNI(21, 'cos', True)))
+	
+
+
+	

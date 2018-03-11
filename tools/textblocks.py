@@ -121,15 +121,8 @@ def genNI(ni_count, type_gen='linear', sym=False): #генерирует тек�
 		return np.linspace(0, 1, ni_count)
 
 	elif type_gen == 'cos':
-		list_angles = [x for x in np.linspace(math.pi/2, 0 if sum==False else -math.pi/2, ni_count)]
-		ni_arr = []
-		for item in list_angles:
-			if item == list_angles[0]:
-				last = math.cos(item)
-				ni_arr.append(round(math.cos(item), 4))
-			else:
-				ni_arr.append(round(math.cos(item), 4))
-				last = math.cos(item)
+		#генерируем список точек для косинусного распределения сетки
+		ni_arr = [round(math.cos(x), 4) for x in np.linspace(math.pi/2, 0 if sym==False else -math.pi/2, ni_count)]
 		if sym == False:
 			return ni_arr
 		else:
@@ -170,6 +163,7 @@ def genTextNI(ni_arr):
 if __name__ == '__main__':
 	
 	print(genTextNI(genNI(21, 'cos', True)))
+	print(genTextNI(genNI(20)))
 	
 
 

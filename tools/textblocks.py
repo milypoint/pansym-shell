@@ -118,7 +118,7 @@ def genNI(ni_count, type_gen='linear', sym=False): #генерирует тек�
 	sym=True - распределение симетрично относительно середины
 	'''
 	if type_gen == 'linear':
-		return np.linspace(0, 1, ni_count)
+		return [round(x, 4) for x in np.linspace(0, 1, ni_count)]
 
 	elif type_gen == 'cos':
 		#генерируем список точек для косинусного распределения сетки

@@ -158,7 +158,7 @@ class WingBlock2(WingBlock):
 					pass
 				elif key == 'name':
 					new_data[key] = value + ' part 1'
-				elif key == 'ne' and value.find('-') == -1:
+				elif key == 'ne' and value.find('-') != -1:
 					new_data[key] = value.replace('-', '')
 				else:
 					new_data[key] = value

@@ -19,7 +19,7 @@ def gencalc():
 	centerOfMass = { 'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*0.45 + x_1 + 0.25*b, 'y' : 0, 'z' : 0}
 
 	#ranges:
-	e_wingspan = [ f_wingspan * x / 100 for x in range(100, 165, 5)]
+	e_wingspan = [ f_wingspan * x / 100 for x in range(100, 170, 10)]
 	rudders_ratio = [x for x in range(30, 90, 20)] 
 	where_rudders = [x for x in range(1, 3)]
 	delta = [x for x in range(-20, 30, 10)] #угол отклонения рулей
@@ -88,12 +88,11 @@ def gencalc():
 						#для первого крыла
 						data = dict()
 						data['name'] = 'first wing with deflected edge'
-						data['ne'] = doLenTiny3(cur_ne); cur_ne += 1
-						data['ns'] = doLenTiny3(4)
-						data['ni'] = doLenTiny3(19)
+						data['ne'] = doLenTiny3(cur_ne); cur_ne += 2
+						data['ni'] = doLenTiny3(20)
 						data['Xm'] = doLenTiny7(x_1)
 						data['Ym'] = doLenTiny7(y_1)
-						data['Zm0'] = doLenTiny7(0)						
+						data['Zm0'] = doLenTiny7(0)
 						data['Zm1'] = doLenTiny7(f_wingspan - f_wingspan*r_r/100)
 						data['Zm2'] = doLenTiny7(f_wingspan)
 						data['Ch'] = doLenTiny7(b)
@@ -106,8 +105,7 @@ def gencalc():
 						data = dict()
 						data['name'] = 'second wing'
 						data['ne'] = doLenTiny3(-cur_ne); cur_ne += 1
-						data['ns'] = doLenTiny3(2)
-						data['ni'] = doLenTiny3(19)
+						data['ni'] = doLenTiny3(20)
 						data['Xm'] = doLenTiny7(x_2)
 						data['Ym'] = doLenTiny7(y_2)
 						data['Zm1'] = doLenTiny7(0)
@@ -122,8 +120,7 @@ def gencalc():
 						data = dict()
 						data['name'] = 'first wing'
 						data['ne'] = doLenTiny3(cur_ne); cur_ne += 1
-						data['ns'] = doLenTiny3(2)
-						data['ni'] = doLenTiny3(19)
+						data['ni'] = doLenTiny3(20)
 						data['Xm'] = doLenTiny7(x_1)
 						data['Ym'] = doLenTiny7(y_1)
 						data['Zm1'] = doLenTiny7(0)
@@ -137,21 +134,18 @@ def gencalc():
 						#для второго крыла
 						data = dict()
 						data['name'] = 'second wing with deflected edge'
-						data['ne'] = doLenTiny3(-cur_ne); cur_ne += 1
-						data['ns'] = doLenTiny3(4)
-						data['ni'] = doLenTiny3(19)
+						data['ne'] = doLenTiny3(-cur_ne); cur_ne += 2
+						data['ni'] = doLenTiny3(20)
 						data['Xm'] = doLenTiny7(x_2)
 						data['Ym'] = doLenTiny7(y_2)
 						data['Zm0'] = doLenTiny7(0)		
-						#Замечание!				
-						#data['Zm1'] = doLenTiny7(e_w - e_w*r_r/100) #отношение относительно текущего крыла
 						data['Zm1'] = doLenTiny7(f_wingspan - f_wingspan*r_r/100) #отношение относительно переднего крыла
 						data['Zm2'] = doLenTiny7(e_w)
 						data['Ch'] = doLenTiny7(b)
 						data['Fi'] = doLenTiny7(0)
 
-						f_wing = WingBlock2(data)
-						sumtext += f_wing.getText() + '\n'
+						e_wing = WingBlock2(data)
+						sumtext += e_wing.getText() + '\n'
 
 					#Для последнего блока
 					data = dict()

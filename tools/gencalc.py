@@ -5,7 +5,7 @@ from textblocks import *
 from rotate_foilpoints import *
 import time
 
-def gencalc():
+def main():
 
 	bool_do_calc = True #Нужно ли делать основной расчет (использовать для отладки)
 
@@ -16,7 +16,6 @@ def gencalc():
 	y_1 = 0.125 #Положение передней кропки второго крыла по оси У
 	y_2 = - y_1
 	f_wingspan = 5 * b #Размах переднего крыла
-	centerOfMass = { 'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*0.45 + x_1 + 0.25*b, 'y' : 0, 'z' : 0}
 
 	#ranges:
 	e_wingspan = [ f_wingspan * x / 100 for x in range(100, 170, 10)]
@@ -46,6 +45,10 @@ def gencalc():
 			for e_w in e_wingspan:
 				for d in delta:
 					sumtext = ''
+					#центр масс расчитывается в зависимости от соотношения размахов крыльев
+					centerOfMass = { 	'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*(e_w/(e_w + 1.25) - 0.05) + x_1 + 0.25*b, 
+										'y' : 0, 
+										'z' : 0}
 					#Создаем словарь для вставки в блок с управляющей информацией
 					data = dict()
 					data['name'] = 'tandem'
@@ -197,6 +200,6 @@ def gencalc():
 						calc_count += 1
 
 if __name__ == '__main__':
-	gencalc()
+	main()
 
 	

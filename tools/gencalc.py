@@ -53,7 +53,7 @@ def main():
 					data = dict()
 					data['name'] = 'tandem'
 					data['Sk'] = doLenTiny7(f_wingspan * b + e_w * b)
-					data['Bk'] = doLenTiny7(b)
+					data['Bk'] = doLenTiny7(2*b)
 					data['Lk'] = doLenTiny7((f_wingspan + e_w)/2)
 					data['Xc'] = doLenTiny7(centerOfMass['x'])
 					data['Yc'] = doLenTiny7(centerOfMass['y'])

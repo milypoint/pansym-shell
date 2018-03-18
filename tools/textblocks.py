@@ -116,7 +116,7 @@ class FuselagBlock(TextBlock):
 
 class WingBlock(TextBlock):
 	block = """--- %(name)-10s ---
-%(ne)-3s 2  0  2 -16 1  20                        0   0        1  
+%(ne)-3s 2  0  2 -16 1 %(ni)-3s                        0   0        1  
  NE IT IB NS NU II NI UI NL IC IM IP IM ICO   ICOE
 < NP  >< Xm  >< Ym  >< Zm  ><Ch m >< Fi  >
 %(np)-7s%(Xm)-7s%(Ym)-7s%(Zm1)-7s%(Ch)-7s%(Fi)-7s
@@ -126,17 +126,25 @@ class WingBlock(TextBlock):
 	
 	def __init__(self, data):
 		data['np'] = '1'
-		self.text = (self.block + '\n' + genTextNI(genNI(20, 'cos'))) % data
+		self.data = data
+		self.data['ni'] = self.genNICount(self.data)
+		self.text = (self.block + '\n' + genTextNI(genNI(self.data['ni'], 'cos'))) % data
+
+	def genNICount(self, data):
+		ni = int((float(data['Zm2']) - float(data['Zm1'])) *10)
+		return ni if ni > 10 else 10
 
 class WingBlock2(WingBlock):
 
 	def __init__(self, data):
 		inside_data = self.data4Part(data, 'inside')
+		inside_data['ni'] = self.genNICount(inside_data)
 		outside_data = self.data4Part(data, 'outside')
+		outside_data['ni'] = self.genNICount(outside_data)
 
-		self.text = (self.block + '\n' + genTextNI(genNI(20, 'cos'))) % inside_data
+		self.text = (self.block + '\n' + genTextNI(genNI(inside_data['ni'], 'cos'))) % inside_data
 		self.text += '\n'
-		self.text += (self.block + '\n' + genTextNI(genNI(20, 'cos', sym='True'))) % outside_data
+		self.text += (self.block + '\n' + genTextNI(genNI(outside_data['ni'], 'cos', sym='True'))) % outside_data
 
 	def data4Part(self, data, part):
 		'''

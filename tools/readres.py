@@ -48,27 +48,44 @@ def calcEfficiency(data):
 					last_data [key] = value
 
 		if isChangeData(item, last_data) == True: #если данные, которые не входят в расчет еффективностей, 
-		#изменились, то расчитать саму еффективность и сохранить
+			#изменились, то считаем еффективность
 			new_item = dict()
 			for key, value in last_data.items():
 				new_item [key] = value
 				last_data [key] = item[key]
+			#Сдвигаем значения коэф. момента на величину равную коэф. при нулевом отклонении руля
+			#где [i for i,x in enumerate(d) if x == 0][0] - определение индекса массива нулевого отклонения
+			mx = [x - mx[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mx]
+			mz = [x - mz[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mz]
+			#аппроксимируем данные прямой и получаем коэф. ее наклона
 			new_item['kx'] = round(np.polyfit(d, mx, 1)[0], 4) 
 			new_item['kz'] = round(np.polyfit(d, mz, 1)[0], 4) 
+			new_item['d'] = d
+			new_item['mx'] = mx
+			new_item['mz'] = mz
 			ndata.append(new_item)
 			d, mx, mz = [], [], []
+
 		d.append(item['delta'])
 		mx.append(item['coefs'][3])
 		mz.append(item['coefs'][5])
 
-		if item == data[-1]: #если последний словарь из массива, то расчитать саму еффективность и сохранить
+		if item == data[-1]: #если последний словарь из массива, то считаем еффективность
 			new_item = dict()
 			for key, value in last_data.items():
 				new_item [key] = value
 				last_data [key] = item[key]
+			#
+			mx = [x - mx[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mx]
+			mz = [x - mz[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mz]
+			#
 			new_item['kx'] = round(np.polyfit(d, mx, 1)[0], 4) 
 			new_item['kz'] = round(np.polyfit(d, mz, 1)[0], 4) 
+			new_item['d'] = d
+			new_item['mx'] = mx
+			new_item['mz'] = mz
 			ndata.append(new_item)
+			
 	return ndata
 
 class Figure:

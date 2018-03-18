@@ -126,14 +126,17 @@ class WingBlock(TextBlock):
 	
 	def __init__(self, data):
 		data['np'] = '1'
-		self.text = (self.block + '\n' + genTextNI(genNI(int(data['ni']), 'cos'))) % data
+		self.text = (self.block + '\n' + genTextNI(genNI(20, 'cos'))) % data
 
 class WingBlock2(WingBlock):
 
 	def __init__(self, data):
-		self.text = (self.block + '\n' + genTextNI(genNI(int(data['ni']), 'cos'))) % self.data4Part(data, 'inside')
+		inside_data = self.data4Part(data, 'inside')
+		outside_data = self.data4Part(data, 'outside')
+
+		self.text = (self.block + '\n' + genTextNI(genNI(20, 'cos'))) % inside_data
 		self.text += '\n'
-		self.text += (self.block + '\n' + genTextNI(genNI(int(data['ni']), 'cos', sym='True'))) % self.data4Part(data, 'outside')
+		self.text += (self.block + '\n' + genTextNI(genNI(20, 'cos', sym='True'))) % outside_data
 
 	def data4Part(self, data, part):
 		'''
@@ -165,10 +168,11 @@ class WingBlock2(WingBlock):
 			new_data['np'] = '1'
 		elif part == 'outside':
 			for key, value in data.items():
-				if key == 'Zm0':
-					pass
-				elif key == 'ne':
-					new_data[key] = str(int(value) + 1) 
+				if key == 'ne':
+					if value.find('-') != -1:
+						new_data[key] = str(int(value) - 1)
+					else:
+						new_data[key] = str(int(value) + 1) 
 				elif key == 'name':
 					new_data[key] = value + ' part 2'
 				else:

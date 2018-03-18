@@ -21,7 +21,7 @@ def main():
 	e_wingspan = [ f_wingspan * x / 100 for x in range(100, 170, 10)]
 	rudders_ratio = [x for x in range(30, 90, 20)] 
 	where_rudders = [x for x in range(1, 3)]
-	delta = [x for x in range(-10, 15, 5)] #угол отклонения рулей
+	delta = [x for x in range(-25, 30, 5)] #угол отклонения рулей
 
 	print('\n --- Ranges --- \n')
 	print('Back wingspan: ' + str(e_wingspan))

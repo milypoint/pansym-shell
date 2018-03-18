@@ -244,3 +244,29 @@ if __name__ == '__main__':
 			figname = data_dict + 'figure_4_Эффективность руля высоты на заднем крыле.png' 
 		fig.cfg['xlabel'] = 'L2/L1'
 		fig.plot(figname)
+
+	#генерируем графики коэф-ов моментов от угла отклонения
+
+	for item in data[::6]: #делаем графики для каждого 6 случая
+		plt.figure()
+		plt.suptitle('Значения к-ов для:положение руля=' + str(item['rudpos']) + 
+			'\nL2/L1=' + str(item['backwingspan']/1.25) +
+			'\nОтносительный размах руля=' + str(item['ruderratio']) + str('%'))
+		plt.xlabel('Delta')
+		plt.ylabel('Mx, Mz')
+		plt.grid(True)		
+		#Далее создаем массивы, содержащие значения коэф-ов при линейной аппроксимации
+		mx = [np.polyfit(item['d'], item['mx'], 1)[0] * x + np.polyfit(item['d'], item['mx'], 1)[1] for x in item['d']]
+		mz = [np.polyfit(item['d'], item['mz'], 1)[0] * x + np.polyfit(item['d'], item['mz'], 1)[1] for x in item['d']]
+		plt.plot(item['d'], item['mx'], 'rx')
+		plt.plot(item['d'], mx, 'r-', label='Mx')		
+		plt.plot(item['d'], item['mz'], 'bx')
+		plt.plot(item['d'], mz, 'b-', label='Mz')
+		plt.legend()
+
+		plt.savefig(data_dict + 'mxmz_delta/' + 'rudpos='+ str(item['rudpos']) + 
+			' spanratio=' + str(item['backwingspan']/1.25) +
+			' ruderratio=' + str(item['ruderratio']) + '.png')
+		print(data_dict + 'mxmz_delta/' + 'rudpos='+ str(item['rudpos']) + 
+			' spanratio=' + str(item['backwingspan']/1.25) +
+			' ruderratio=' + str(item['ruderratio']) + '.png')

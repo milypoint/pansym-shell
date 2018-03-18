@@ -6,6 +6,7 @@ import glob
 from rotate_foilpoints import *
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 
 def fileNameDecode(fname):
 	'''
@@ -57,12 +58,22 @@ def calcEfficiency(data):
 			#где [i for i,x in enumerate(d) if x == 0][0] - определение индекса массива нулевого отклонения
 			mx = [x - mx[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mx]
 			mz = [x - mz[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mz]
+
+			aprx_i = [i for i,x in enumerate(d) if x >=-10 and x <=10]
+
+			aprx_d = d[aprx_i[0] : aprx_i[-1] + 1]
+			aprx_mx = mx[aprx_i[0] : aprx_i[-1] + 1]
+			aprx_mz = mz[aprx_i[0] : aprx_i[-1] + 1]
+
 			#аппроксимируем данные прямой и получаем коэф. ее наклона
-			new_item['kx'] = round(np.polyfit(d, mx, 1)[0], 4) 
-			new_item['kz'] = round(np.polyfit(d, mz, 1)[0], 4) 
+			new_item['kx'] = round(np.polyfit(aprx_d, aprx_mx, 1)[0], 4) 
+			new_item['kz'] = round(np.polyfit(aprx_d, aprx_mz, 1)[0], 4) 
 			new_item['d'] = d
 			new_item['mx'] = mx
 			new_item['mz'] = mz
+			new_item['aprx_d'] = aprx_d
+			new_item['aprx_mx'] = aprx_mx
+			new_item['aprx_mz'] = aprx_mz
 			ndata.append(new_item)
 			d, mx, mz = [], [], []
 
@@ -78,12 +89,19 @@ def calcEfficiency(data):
 			#
 			mx = [x - mx[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mx]
 			mz = [x - mz[ [i for i,x in enumerate(d) if x == 0][0] ] for x in mz]
+			#массивы точек входящие в диапазон аппроксимации
+			aprx_d = d[ [i for i,x in enumerate(d) if x >=-10 and x <=10][0] : [i for i,x in enumerate(d) if x >=-10 and x <=10][-1] + 1] 
+			aprx_mx = mx[ [i for i,x in enumerate(d) if x >=-10 and x <=10][0] : [i for i,x in enumerate(d) if x >=-10 and x <=10][-1] + 1]
+			aprx_mz = mz[ [i for i,x in enumerate(d) if x >=-10 and x <=10][0] : [i for i,x in enumerate(d) if x >=-10 and x <=10][-1] + 1]
 			#
-			new_item['kx'] = round(np.polyfit(d, mx, 1)[0], 4) 
-			new_item['kz'] = round(np.polyfit(d, mz, 1)[0], 4) 
+			new_item['kx'] = round(np.polyfit(aprx_d, aprx_mx, 1)[0], 4) 
+			new_item['kz'] = round(np.polyfit(aprx_d, aprx_mz, 1)[0], 4) 
 			new_item['d'] = d
 			new_item['mx'] = mx
 			new_item['mz'] = mz
+			new_item['aprx_d'] = aprx_d
+			new_item['aprx_mx'] = aprx_mx
+			new_item['aprx_mz'] = aprx_mz
 			ndata.append(new_item)
 			
 	return ndata
@@ -247,7 +265,9 @@ if __name__ == '__main__':
 
 	#генерируем графики коэф-ов моментов от угла отклонения
 
-	for item in data[::6]: #делаем графики для каждого 6 случая
+
+
+	for item in data: #data[:int(len(data)/4) * 4 : int(len(data)/4)] #делаем 8 графиков для разных случаев
 		plt.figure()
 		plt.suptitle('Значения к-ов для:положение руля=' + str(item['rudpos']) + 
 			'\nL2/L1=' + str(item['backwingspan']/1.25) +
@@ -256,17 +276,15 @@ if __name__ == '__main__':
 		plt.ylabel('Mx, Mz')
 		plt.grid(True)		
 		#Далее создаем массивы, содержащие значения коэф-ов при линейной аппроксимации
-		mx = [np.polyfit(item['d'], item['mx'], 1)[0] * x + np.polyfit(item['d'], item['mx'], 1)[1] for x in item['d']]
-		mz = [np.polyfit(item['d'], item['mz'], 1)[0] * x + np.polyfit(item['d'], item['mz'], 1)[1] for x in item['d']]
+
+		mx = [np.polyfit(item['aprx_d'], item['aprx_mx'], 1)[0] * x + np.polyfit(item['aprx_d'], item['aprx_mx'], 1)[1] for x in item['aprx_d']]
+		mz = [np.polyfit(item['aprx_d'], item['aprx_mz'], 1)[0] * x + np.polyfit(item['aprx_d'], item['aprx_mz'], 1)[1] for x in item['aprx_d']]
 		plt.plot(item['d'], item['mx'], 'rx')
-		plt.plot(item['d'], mx, 'r-', label='Mx')		
+		plt.plot(item['aprx_d'], mx, 'r-', label='Mx')		
 		plt.plot(item['d'], item['mz'], 'bx')
-		plt.plot(item['d'], mz, 'b-', label='Mz')
+		plt.plot(item['aprx_d'], mz, 'b-', label='Mz')
 		plt.legend()
 
 		plt.savefig(data_dict + 'mxmz_delta/' + 'rudpos='+ str(item['rudpos']) + 
-			' spanratio=' + str(item['backwingspan']/1.25) +
-			' ruderratio=' + str(item['ruderratio']) + '.png')
-		print(data_dict + 'mxmz_delta/' + 'rudpos='+ str(item['rudpos']) + 
 			' spanratio=' + str(item['backwingspan']/1.25) +
 			' ruderratio=' + str(item['ruderratio']) + '.png')

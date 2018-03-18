@@ -142,7 +142,7 @@ def main():
 						data['Xm'] = doLenTiny7(x_2)
 						data['Ym'] = doLenTiny7(y_2)
 						data['Zm0'] = doLenTiny7(0)		
-						data['Zm1'] = doLenTiny7(f_wingspan - f_wingspan*r_r/100) #отношение относительно переднего крыла
+						data['Zm1'] = doLenTiny7(e_w - f_wingspan*r_r/100) #отношение относительно переднего крыла
 						data['Zm2'] = doLenTiny7(e_w)
 						data['Ch'] = doLenTiny7(b)
 						data['Fi'] = doLenTiny7(0)

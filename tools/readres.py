@@ -28,27 +28,14 @@ def fileNameDecode(fname):
 	m = re.match(tamplate, fname)
 	return m.group('where'), float(m.group('span')), float(m.group('ratio')), float(m.group('delta'))
 
-def isChangeData(cur_data, last_data):
-	'''
-	Функция для проверки соответсвия данных словаря last_data с данным словаря cur_data.
-	Словарь last_data является "подсловарём" cur_data.
-
-	Возвращает True если данные не совпадают.
-	'''
-	for key, value in last_data.items():
-		if cur_data[key] != value: return True
-	return False
-
 def sortByGroup(data, group_keys, sort_key=None, split=False):
 	'''
 	Групирует данные по ключам group_keys, сортирует группы по ключу sort_key (опционально).
-
 	Вход:
 		data - список словарей. Словари должны иметь все ключи, в ходящие в признак группы. 
 		group_keys - список ключей словаря, по которым происходит группирование
 		sort_key - необязательный параметр, ключ сортировки внутри каждой группы
 		split - если True, то возвращается список, содержащий группы словарей. Иначе возвращается список словарей.
-
 	Выход:
 		Список словарей, упорядоченный по (отсортированным группам, если указан ключ сортировки) группам 
 	'''
@@ -69,11 +56,9 @@ def sortByGroup(data, group_keys, sort_key=None, split=False):
 def calcEfficiency(data):
 	'''
 	Расчитывает еффективность руля по координатам ох и oz
-
 	Принимает массив словарей с данными, которые содержат:
 		delta - угол отклонения руля
 		coefs - массив с коеффициентами сил и моментов
-
 	Возвращает массив словарей с расчитанной еффективностю относительно соответствующий осей
 	'''
 	#Группируем данные, сортируем по углу отклонения и разделяем группы:
@@ -131,7 +116,6 @@ def genMainFigs(data):
 			plt.plot(x, kx, 'ro', x, kx, 'k')
 			plt.annotate(str(group[0]['ruderratio'])+'%', xy=(x[-1], kx[-1]), 
 				xytext=(x[-1]+abs(x[-1]*0.01), kx[-1]+abs(kx[-1]*0.01)))
-
 			plt.figure(1)
 			plt.plot(x, kz, 'ro', x, kz, 'k')
 			plt.annotate(str(group[0]['ruderratio'])+'%', xy=(x[-1], kz[-1]), 
@@ -141,14 +125,12 @@ def genMainFigs(data):
 			plt.plot(x, kx, 'ro', x, kx, 'k')
 			plt.annotate(str(group[0]['ruderratio'])+'%', xy=(x[-1], kx[-1]), 
 				xytext=(x[-1]+abs(x[-1]*0.01), kx[-1]+abs(kx[-1]*0.01)))
-
 			plt.figure(3)
 			plt.plot(x, kz, 'ro', x, kz, 'k')
 			plt.annotate(str(group[0]['ruderratio'])+'%', xy=(x[-1], kz[-1]), 
 				xytext=(x[-1]+abs(x[-1]*0.01), kz[-1]+abs(kz[-1]*0.01)))
 	
 	#Конфигурируем графики:
-
 	plt.figure(0)
 	plt.title('Эффективность элерона на переднем крыле')
 	plt.ylabel('eff_ox')
@@ -208,75 +190,6 @@ def genMXMZFigs(data):
 			' spanratio=' + str(item['backwingspan']/1.25) +
 			' ruderratio=' + str(item['ruderratio']) + '.png')
 
-class Figure:
-	'''
-	Класс, представляющий график, с несколькими кривыми.
-
-	Свойства класса:
-		self.fignumber - номер текущего графика в системе pyplot
-		self.cfg - параметры графика (применяются при вызове метода self.plot())
-	'''
-
-	def __init__(self, fignumber):
-		'''
-		Создает объект изображения графика.
-		Создает свойства self.fignumber, self.cfg, self.curves.
-		'''
-		self.fignumber = fignumber
-		plt.figure(fignumber)
-		self.cfg = {	'title' : None,
-						'xlabel' : None,
-						'ylabel' : None,
-						'grid' : True}
-			
-		self.curves = [] #список массивов точек для разных кривых
-
-	def config(self):
-		'''
-		Переносит свойства класса в свойства изображения
-		'''
-		plt.figure(self.fignumber)
-		for key, value in self.cfg.items():
-			if value != None:
-				if key == 'title':
-					plt.title(value)
-				elif key == 'xlabel':
-					plt.xlabel(value)
-				elif key == 'ylabel':
-					plt.ylabel(value)
-				elif key == 'grid':
-					plt.grid(value)
-
-	def addCurve(self, xarr, yarr, annotate=None):
-		'''
-		Добавляет массивы точек кривой в общий список класса
-
-		xarr - массив точек по горизонтальной оси
-		yarr - массив точек по вертикальной оси
-		annotate - подпись кривой на графике
-		'''
-		plt.figure(self.fignumber)
-		self.curves.append({'x' : xarr, 'y' : yarr, 'annotate' : annotate})
-
-	def plot(self, infile = None):
-		'''
-		Передает изображение графика на вывод: 
-			в файл (если infile = "путь к файлу")
-			выводит на экран (если infile = None, по умолчанию)
-		'''
-		self.config()
-		for c in self.curves:
-			plt.plot(c['x'], c['y'], 'ro', c['x'], c['y'], 'k')
-			if c['annotate'] != None:
-				plt.annotate(str(c['annotate'])+'%', xy=(c['x'][-1], c['y'][-1]), 
-					xytext=(c['x'][-1]+abs(c['x'][-1]*0.01), c['y'][-1]+abs(c['y'][-1]*0.01)))
-		if infile != None:
-			plt.savefig(infile)
-		else:
-			plt.show()
-
-
-
 if __name__ == '__main__':
 
 	oupath = getProjectDir() + 'data\\ou_files\\' #папка с выходными файлами
@@ -290,6 +203,8 @@ if __name__ == '__main__':
 		with open(oupath + file, 'r') as f:
 			raw_data = f.read() #чтения выходного файла
 
+		if raw_data == '':
+			print('Найден пустой файл. Операция прекращена')
 		#Для скоросной системы координат
 		raw_data = raw_data.split('MZV')[1].split('CX_TREN')[0] #из полученых данных вырезаем все, кроме нужного блока
 
@@ -308,96 +223,7 @@ if __name__ == '__main__':
 							'delta' : d['delta'],
 							'coefs' : d['coefs']})
 	#Считаем еффективность руля:
-	data = calcEfficiency(data)
-
-	#iprint(sortByGroup(data, ['rudpos', 'ruderratio'], split=True), True)
-	data = sortByGroup(data, ['rudpos', 'ruderratio'])
-
-	
-	'''	
-	Далее генерируем графики
-	'''
+	data = calcEfficiency(data)	
+	#Далее генерируем графики
 	genMainFigs(data)
-
 	genMXMZFigs(data)
-
-	'''
-	figures = []
-
-	for num in range(0, 4):
-		figures.append(Figure(num))
-
-	for item in data:
-		if item == data[0]:
-			last_data = {'rudpos' : item['rudpos'], 'ruderratio' : item['ruderratio']}
-			backwingspan, kx, kz = [], [], []
-
-		if isChangeData(item, last_data) == True:
-			if last_data['rudpos'] == 'front':
-				figures[0].addCurve(backwingspan, kx, last_data['ruderratio'])
-				figures[1].addCurve(backwingspan, kz, last_data['ruderratio'])
-			elif last_data['rudpos'] == 'back':
-				figures[2].addCurve(backwingspan, kx, last_data['ruderratio'])
-				figures[3].addCurve(backwingspan, kz, last_data['ruderratio'])
-			last_data = {'rudpos' : item['rudpos'], 'ruderratio' : item['ruderratio']}
-			backwingspan, kx, kz = [], [], []
-
-		backwingspan.append(abs(item['backwingspan']/1.25))
-		kx.append(abs(item['kx']))
-		kz.append(abs(item['kz']))
-
-		if item == data[-1]:
-			if last_data['rudpos'] == 'front':
-				figures[0].addCurve(backwingspan, kx, last_data['ruderratio'])
-				figures[1].addCurve(backwingspan, kz, last_data['ruderratio'])
-			elif last_data['rudpos'] == 'back':
-				figures[2].addCurve(backwingspan, kx, last_data['ruderratio'])
-				figures[3].addCurve(backwingspan, kz, last_data['ruderratio'])
-
-	data_dict = getProjectDir() + 'data/images/'
-	for fig in figures:
-		if fig == figures[0]:
-			fig.cfg['title'] = 'Эффективность элерона на переднем крыле'
-			fig.cfg['ylabel'] = 'eff_ox'
-			figname = data_dict + 'figure_1_Эффективность элерона на переднем крыле.png' 
-		elif fig == figures[1]:
-			fig.cfg['title'] = 'Эффективность руля высоты на переднем крыле'
-			fig.cfg['ylabel'] = 'eff_oz'
-			figname = data_dict + 'figure_2_Эффективность руля высоты на переднем крыле.png' 
-		elif fig == figures[2]:
-			fig.cfg['title'] = 'Эффективность элерона на заднем крыле'
-			fig.cfg['ylabel'] = 'eff_ox'
-			figname = data_dict + 'figure_3_Эффективность элерона на заднем крыле.png' 
-		elif fig == figures[3]:
-			fig.cfg['title'] = 'Эффективность руля высоты на заднем крыле'
-			fig.cfg['ylabel'] = 'eff_oz'
-			figname = data_dict + 'figure_4_Эффективность руля высоты на заднем крыле.png' 
-		fig.cfg['xlabel'] = 'L2/L1'
-		fig.plot(figname)
-
-	#генерируем графики коэф-ов моментов от угла отклонения
-	'''
-
-	'''
-	for item in data: #data[:int(len(data)/4) * 4 : int(len(data)/4)] #делаем 8 графиков для разных случаев
-		plt.figure()
-		plt.suptitle('Значения к-ов для:положение руля=' + str(item['rudpos']) + 
-			'\nL2/L1=' + str(item['backwingspan']/1.25) +
-			'\nОтносительный размах руля=' + str(item['ruderratio']) + str('%'))
-		plt.xlabel('Delta')
-		plt.ylabel('Mx, Mz')
-		plt.grid(True)		
-		#Далее создаем массивы, содержащие значения коэф-ов при линейной аппроксимации
-
-		mx = [np.polyfit(item['aprx_d'], item['aprx_mx'], 1)[0] * x + np.polyfit(item['aprx_d'], item['aprx_mx'], 1)[1] for x in item['aprx_d']]
-		mz = [np.polyfit(item['aprx_d'], item['aprx_mz'], 1)[0] * x + np.polyfit(item['aprx_d'], item['aprx_mz'], 1)[1] for x in item['aprx_d']]
-		plt.plot(item['d'], item['mx'], 'rx')
-		plt.plot(item['aprx_d'], mx, 'r-', label='Mx')		
-		plt.plot(item['d'], item['mz'], 'bx')
-		plt.plot(item['aprx_d'], mz, 'b-', label='Mz')
-		plt.legend()
-
-		plt.savefig(data_dict + 'mxmz_delta/' + 'rudpos='+ str(item['rudpos']) + 
-			' spanratio=' + str(item['backwingspan']/1.25) +
-			' ruderratio=' + str(item['ruderratio']) + '.png')
-	'''

@@ -1,3 +1,3 @@
-cd "%~dp0"
+cd /d "%~dp0"
 @ECHO OFF
-D:\GoogleSyns\VL-32\Diplom\work\pansymUI\PANSYM\Pansym98.exe tandem
+Pansym98.exe tandem

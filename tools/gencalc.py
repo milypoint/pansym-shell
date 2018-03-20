@@ -4,8 +4,60 @@
 from textblocks import *
 from rotate_foilpoints import *
 import time
+import subprocess #для запуска батника
+import multiprocessing
+from os import getpid
+import zipfile
+import shutil
 
-def gencalc():
+def runPansymBat(batfile):
+	'''
+	Функция для запуска *.bat файла
+	batfile - полный путь к файлу
+	'''
+	p = subprocess.Popen(batfile, shell=True, stdout = subprocess.PIPE)
+	stdout, stderr = p.communicate()
+	print(p.returncode) # is 0 if success
+
+def pansymWorker(data): 
+	'''
+	Функция для расчета в пансиме по входным данным.
+	data - словарь, содержащий поля:
+		sumtext - текстовый блок для записи в *.in файл
+		file_name - имя файла, содержащее метаданные, для записи в папку с *.ou файлами
+	'''
+	sumtext = data['sumtext']
+	ou_filename = data['file_name']
+	process_id = getpid()
+	pansym_dir = getProjectDir() + 'tools\\PANSYM\\'
+	ou_dir = getProjectDir() + '\\data\\ou_files\\'
+	temp_pansym_dir = pansym_dir + 'Temp\\' + str(process_id)
+	#Создаем временную папку для Пансима
+	if not os.path.exists(temp_pansym_dir):
+		os.makedirs(temp_pansym_dir)
+		#Розпаковываем модуль мансима и батник во временную папку
+		zip_ref = zipfile.ZipFile(pansym_dir + 'Pansym98.zip', 'r')
+		zip_ref.extractall(temp_pansym_dir)
+		zip_ref.close()
+
+	#запись текстового блока в файл для расчета
+	with open(temp_pansym_dir + '\\' + 'tandem' + '.in', 'w') as f:
+		f.write(sumtext)
+
+	#запускаем модуль пансима
+	runPansymBat(temp_pansym_dir + r"\run_pan.bat")
+
+	#Копируем файл с результатами в соответствующую папку
+	with open(temp_pansym_dir + r'\tandem.ou', 'r') as f:
+		out_data = f.read() #чтение из выходного файла *.ou 
+	os.remove(temp_pansym_dir + r'\tandem.ou') #удаляем на всякий случай файл с результатом расчета
+
+	with open(ou_dir + '\\' + ou_filename, 'w') as f:
+		f.write(out_data) #запись текстового блока в файл в соответствующей директории со всеми выходными файлами
+
+if __name__ == '__main__':
+
+	BEFORE = time.clock()
 
 	bool_do_calc = True #Нужно ли делать основной расчет (использовать для отладки)
 
@@ -16,13 +68,12 @@ def gencalc():
 	y_1 = 0.125 #Положение передней кропки второго крыла по оси У
 	y_2 = - y_1
 	f_wingspan = 5 * b #Размах переднего крыла
-	centerOfMass = { 'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*0.45 + x_1 + 0.25*b, 'y' : 0, 'z' : 0}
 
 	#ranges:
 	e_wingspan = [ f_wingspan * x / 100 for x in range(100, 170, 10)]
 	rudders_ratio = [x for x in range(30, 90, 20)] 
 	where_rudders = [x for x in range(1, 3)]
-	delta = [x for x in range(-20, 30, 10)] #угол отклонения рулей
+	delta = [x for x in range(-25, 30, 5)] #угол отклонения рулей
 
 	print('\n --- Ranges --- \n')
 	print('Back wingspan: ' + str(e_wingspan))
@@ -38,14 +89,21 @@ def gencalc():
 					calc_count += 1
 
 	print('Cycles count: ' + str(calc_count))
-	
+
+	proceses_data = []#данные для каждого расчета (процесса)
+
 	calc_count = 1
 	time_count = time.clock() #инициализируем счетчик времени
+
 	for w_r in where_rudders:
 		for r_r in rudders_ratio:
 			for e_w in e_wingspan:
 				for d in delta:
 					sumtext = ''
+					#центр масс расчитывается в зависимости от соотношения размахов крыльев
+					centerOfMass = { 	'x' : ((x_2 + 0.25*b) - (x_1 + 0.25*b))*(e_w/(e_w + 1.25) - 0.05) + x_1 + 0.25*b, 
+										'y' : 0, 
+										'z' : 0}
 					#Создаем словарь для вставки в блок с управляющей информацией
 					data = dict()
 					data['name'] = 'tandem'
@@ -139,7 +197,7 @@ def gencalc():
 						data['Xm'] = doLenTiny7(x_2)
 						data['Ym'] = doLenTiny7(y_2)
 						data['Zm0'] = doLenTiny7(0)		
-						data['Zm1'] = doLenTiny7(f_wingspan - f_wingspan*r_r/100) #отношение относительно переднего крыла
+						data['Zm1'] = doLenTiny7(e_w - f_wingspan*r_r/100) #отношение относительно переднего крыла
 						data['Zm2'] = doLenTiny7(e_w)
 						data['Ch'] = doLenTiny7(b)
 						data['Fi'] = doLenTiny7(0)
@@ -154,49 +212,32 @@ def gencalc():
 					sumtext += endblock.getText() + '\n'
 
 					'''
-					На данном этапе блок текса пригоден для использование для расчета
+					На данном этапе блок текса готов для использование для расчета
 					Далее запишем текстовый блок в соответсвующий файл
 					'''
 					if bool_do_calc == True:
-						project_dir = getProjectDir()
-						pansym_dir = project_dir + r'tools\PANSYM'
-						ou_dir = project_dir + r'\data\ou_files'
 
 						#Сгенерируем имя файла, которое содержит параметры расчета
-						file_name = 'rudpos=%(where)s_backwingspan=%(span)s_ruderratio=%(ratio)s_delta=%(delta)s'
 						data = dict()
 						data['where'] = 'front' if w_r == 1 else 'back' #расположение руля - на переднем или заднем крыле
 						data['span'] = str(e_w) #размах заднего крыла (размах переднего строго задан и не изменяется)
 						data['ratio'] = str(r_r) #процентное соотношение размаха крыла с размахом руля, расположеном на нем
 						data['delta'] = str(d) #угол отклонения руля
-
-						#запись текстового блока в файл для расчета
-						with open(pansym_dir + '\\' + 'tandem' + '.in', 'w') as f:
-							f.write(sumtext) #запись текстового блока в файл 
-
-						#запускаем модуль пансима
-						import subprocess
-						batfile = pansym_dir + r"\run_pan.bat"
-						p = subprocess.Popen(batfile, shell=True, stdout = subprocess.PIPE)
-						stdout, stderr = p.communicate()
-						print(p.returncode) # is 0 if success
-
-						#Копируем файл с результатами в соответствующую папку
-						with open(pansym_dir + r'\tandem.ou', 'r') as f:
-							out_data = f.read() #чтение из выходного файла *.ou 
-
-						os.remove(pansym_dir + r'\tandem.ou')#удаляем на всякий случай файл с результатом расчета
-
-						with open(ou_dir + '\\' + file_name % data + '.ou', 'w') as f:
-							f.write(out_data) #запись текстового блока в файл в соответствующей директории со всеми выходными файлами
-
-						#Счетчики:
-						print('Cycle time: ' + str(round(time.clock() - time_count, 2)) + ' sec')
-						time_count = time.clock()
-						print('Cycle number: ' + str(calc_count))
-						calc_count += 1
-
-if __name__ == '__main__':
-	gencalc()
-
+						file_name = 'rudpos=%(where)s_backwingspan=%(span)s_ruderratio=%(ratio)s_delta=%(delta)s' % data + '.ou'
+						
+						proceses_data.append({'sumtext':sumtext, 'file_name':file_name, 'calc_count':calc_count})
 	
+	if os.path.exists(getProjectDir() + 'tools\\PANSYM\\Temp'):
+		shutil.rmtree(getProjectDir() + 'tools\\PANSYM\\Temp')				
+	
+	pool = multiprocessing.Pool()
+	pool.map(pansymWorker, proceses_data)	
+
+	print('Program finished in ' + str(round(time.clock() - BEFORE, 1)) + 's')
+
+	if os.path.exists(getProjectDir() + 'tools\\PANSYM\\Temp'):
+		shutil.rmtree(getProjectDir() + 'tools\\PANSYM\\Temp')				
+
+
+
+							

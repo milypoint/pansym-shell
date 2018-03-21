@@ -54,6 +54,7 @@ def pansymWorker(data):
 		out_data = f.read() #чтение из выходного файла *.ou 
 	os.remove(temp_pansym_dir + r'\tandem.ou') #удаляем на всякий случай файл с результатом расчета
 
+	mkdir(ou_dir)
 	with open(ou_dir + '\\' + ou_filename, 'w') as f:
 		f.write(out_data) #запись текстового блока в файл в соответствующей директории со всеми выходными файлами
 

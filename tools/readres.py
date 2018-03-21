@@ -184,7 +184,6 @@ if __name__ == '__main__':
 
 	oupath = getProjectDir() + 'data\\ou_files\\' #папка с выходными файлами
 	filelist = [f for f in listdir(oupath) if isfile(join(oupath, f))] #получаем список файлов
-	#filelist.sort(key=lambda x: os.path.getctime(oupath + x)) #Сортируем по дате создания
 	
 	data = [] #словарь с результатом парсинга выходных файлов
 

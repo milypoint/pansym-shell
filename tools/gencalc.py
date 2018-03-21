@@ -230,6 +230,7 @@ if __name__ == '__main__':
 						
 						proceses_data.append({'sumtext':sumtext, 'file_name':file_name, 'calc_count':calc_count})
 	
+	rmdir(getProjectDir() + '\\data\\ou_files')
 	pool = multiprocessing.Pool()
 	pool.map(pansymWorker, proceses_data)
 	rmdir(getProjectDir() + 'tools\\PANSYM\\Temp')

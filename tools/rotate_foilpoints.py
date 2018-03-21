@@ -14,14 +14,17 @@
 -0.0217-0.0118 0.0000 0.0128 0.0256 0.0382 0.0500 0.0604 0.0689 0.0751
  0.0785 0.0791 0.0767 0.0723 0.0662 0.0587 0.0503 0.0414 0.0324 0.0237
  0.0159 0.0093 0.0042 0.0011 0.0000}
-'''
 
-#fi угол поворота в градусах
+Где первый блок - точки по ох, второй - по оу.
+'''
 
 import os
 from math import *
 
-def rotDots(fi, infile = False):	
+def rotDots(fi, infile = False):
+	'''
+	#fi угол поворота в градусах
+	'''	
 
 	data_dir = getProjectDir() + 'data\\' #файл с данными
 	input_filename = "aerofoil_in.dat" #входной файл с координатами точек профиля
@@ -72,12 +75,15 @@ def rotDots(fi, infile = False):
 
 def getProjectDir():
 	'''
-	Возвращает полный путь к корню проекта 
+	Возвращает полный путь к корню проекта. 
+	Файл с этой функцией должен находится в папке на уровень ниже относительно
+	папки проекта.
 	'''
-	project_name = 'pansym-shell'
 	pdir = os.path.dirname(os.path.abspath(__file__)) 
-	return pdir.split(project_name)[0] + project_name + '\\'
+	return pdir[:-pdir[::-1].find('\\')] 
 
 
 if __name__ == '__main__':
-	print(rotDots(10, r'D:\Projects\pansym-shell\data'))
+	print(rotDots(10, getProjectDir() + r'data'))
+	print(getProjectDir())
+	pass

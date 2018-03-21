@@ -21,23 +21,24 @@
 import os
 from math import *
 
+from utilities import *
+
 def rotDots(fi, infile = False):
 	'''
 	#fi угол поворота в градусах
 	'''	
 
-	data_dir = getProjectDir() + 'data\\' #файл с данными
+	data_dir = getProjectDir() + 'data\\'
 	input_filename = "aerofoil_in.dat" #входной файл с координатами точек профиля
 
 	with open(data_dir + input_filename, 'r') as f:
-		read_data = f.read() #чтение файла в массив
+		read_data = f.read()
 
-	read_data = read_data.replace('-', ' -').replace('\n', '').split(' ') #преобразования массива входных данных в список по разделителю " "
-	del read_data[0] #удаление первого пустого элемента списка
+	read_data = read_data.replace('-', ' -').replace('\n', '').split(' ')[1:]
+
 	points_count = int(len(read_data)/2) #количество точек профиля
 
-	indx = 0
-	while indx < points_count:
+	for indx in range(points_count):
 		x = float(read_data[indx]) #значение х текущей точки
 		y = float(read_data[indx + points_count]) #значение у текущей точки
 		if x > 0.7: #проверка того, что точка находится на участке рулевой поверхности
@@ -46,7 +47,7 @@ def rotDots(fi, infile = False):
 			read_data[indx] = str(round(x_new, 4)) #запись новой точки в список
 			read_data[indx + points_count] = str(round(y_new, 4)) #запись новой точки в список
 			while len(read_data[indx].replace('-', '')) < 6:
-				read_data[indx] = read_data[indx] + '0' #добавление баластного нуля для соблюдения одинаковой длины строк
+				read_data[indx] = read_data[indx] + '0' #добавление нуля для соблюдения одинаковой длины строк
 			while len(read_data[indx + points_count].replace('-', '')) < 6:
 				read_data[indx + points_count] = read_data[indx + points_count] + '0'
 		indx += 1
@@ -73,17 +74,6 @@ def rotDots(fi, infile = False):
 	else:
 		return new_data
 
-def getProjectDir():
-	'''
-	Возвращает полный путь к корню проекта. 
-	Файл с этой функцией должен находится в папке на уровень ниже относительно
-	папки проекта.
-	'''
-	pdir = os.path.dirname(os.path.abspath(__file__)) 
-	return pdir[:-pdir[::-1].find('\\')] 
-
-
 if __name__ == '__main__':
 	print(rotDots(10, getProjectDir() + r'data'))
-	print(getProjectDir())
 	pass

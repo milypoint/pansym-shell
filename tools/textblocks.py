@@ -3,26 +3,7 @@
 import numpy as np
 import math
 
-def doLenTiny7(s): #обрезает строку в 7 знаков
-	s = str(s)
-	if len(s) > 7:
-		return s[:7]
-	else:
-		return s
-
-def doLenTiny6(s): #обрезает строку в 6 знаков
-	s = str(s)
-	if len(s) > 6:
-		return s[:6]
-	else:
-		return s
-
-def doLenTiny3(s): #обрезает строку в 3 знака
-	s = str(s)
-	if len(s) > 3:
-		return s[:3]
-	else:
-		return s
+from utilities import *
 
 def genNI(ni_count, type_gen='linear', sym=False): #генерирует текст с разбивкой сетки по розмаху
 	'''
@@ -66,7 +47,7 @@ def genTextNI(ni_arr):
 		if cur_i == 10:
 			text += '\n'
 			cur_i = 0
-		text += tamplate % doLenTiny6(item)
+		text += tamplate % doLenTiny(item, 6)
 		cur_i += 1
 	return text
 

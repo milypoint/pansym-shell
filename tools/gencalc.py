@@ -1,14 +1,16 @@
 '''
 Генерация расчета с использование модуля Pansym
 '''
-from textblocks import *
-from rotate_foilpoints import *
 import time
 import subprocess #для запуска батника
 import multiprocessing
 from os import getpid
 import zipfile
-import shutil
+
+from utilities import *
+from textblocks import *
+from rotate_foilpoints import *
+
 
 def runPansymBat(batfile):
 	'''
@@ -107,20 +109,20 @@ if __name__ == '__main__':
 					#Создаем словарь для вставки в блок с управляющей информацией
 					data = dict()
 					data['name'] = 'tandem'
-					data['Sk'] = doLenTiny7(f_wingspan * b + e_w * b)
-					data['Bk'] = doLenTiny7(2*b)
-					data['Lk'] = doLenTiny7((f_wingspan + e_w)/2)
-					data['Xc'] = doLenTiny7(centerOfMass['x'])
-					data['Yc'] = doLenTiny7(centerOfMass['y'])
-					data['Zc'] = doLenTiny7(centerOfMass['z'])
+					data['Sk'] = doLenTiny(f_wingspan*b + e_w*b, 7)
+					data['Bk'] = doLenTiny(2*b, 7)
+					data['Lk'] = doLenTiny((f_wingspan + e_w)/2, 7)
+					data['Xc'] = doLenTiny(centerOfMass['x'], 7)
+					data['Yc'] = doLenTiny(centerOfMass['y'], 7)
+					data['Zc'] = doLenTiny(centerOfMass['z'], 7)
 					first_block = FirstBlock(data)
 					sumtext += first_block.getText() + '\n'
 
 					#Создаем словарь для вставки в блок с профилем
 					data = dict()
 					data['name'] = 'SD 8040'
-					data['np'] = doLenTiny3(1)
-					data['nu'] = doLenTiny3(45)
+					data['np'] = doLenTiny(1, 3)
+					data['nu'] = doLenTiny(45, 3)
 					data['xy'] = rotDots(0)
 					foil_1 = AerofoilBlock(data)
 					sumtext += foil_1.getText() + '\n'
@@ -128,8 +130,8 @@ if __name__ == '__main__':
 					#Создаем словарь для вставки в блок с профилем с откошеной кромкой
 					data = dict()
 					data['name'] = 'SD 8040 with deflected edge on angle ' + str(d)
-					data['np'] = doLenTiny3(2)
-					data['nu'] = doLenTiny3(45)
+					data['np'] = doLenTiny(2, 3)
+					data['nu'] = doLenTiny(45, 3)
 					data['xy'] = rotDots(d)
 					foil_1 = AerofoilBlock(data)
 					sumtext += foil_1.getText() + '\n'
@@ -146,15 +148,15 @@ if __name__ == '__main__':
 						#для первого крыла
 						data = dict()
 						data['name'] = 'first wing with deflected edge'
-						data['ne'] = doLenTiny3(cur_ne); cur_ne += 2
-						data['ni'] = doLenTiny3(20)
-						data['Xm'] = doLenTiny7(x_1)
-						data['Ym'] = doLenTiny7(y_1)
-						data['Zm0'] = doLenTiny7(0)
-						data['Zm1'] = doLenTiny7(f_wingspan - f_wingspan*r_r/100)
-						data['Zm2'] = doLenTiny7(f_wingspan)
-						data['Ch'] = doLenTiny7(b)
-						data['Fi'] = doLenTiny7(2)
+						data['ne'] = doLenTiny(cur_ne, 3); cur_ne += 2
+						data['ni'] = doLenTiny(20, 3)
+						data['Xm'] = doLenTiny(x_1, 7)
+						data['Ym'] = doLenTiny(y_1, 7)
+						data['Zm0'] = doLenTiny(0, 7)
+						data['Zm1'] = doLenTiny(f_wingspan - f_wingspan*r_r/100, 7)
+						data['Zm2'] = doLenTiny(f_wingspan, 7)
+						data['Ch'] = doLenTiny(b, 7)
+						data['Fi'] = doLenTiny(2, 7)
 
 						f_wing = WingBlock2(data)
 						sumtext += f_wing.getText() + '\n'
@@ -162,14 +164,14 @@ if __name__ == '__main__':
 						#для второго крыла
 						data = dict()
 						data['name'] = 'second wing'
-						data['ne'] = doLenTiny3(-cur_ne); cur_ne += 1
-						data['ni'] = doLenTiny3(20)
-						data['Xm'] = doLenTiny7(x_2)
-						data['Ym'] = doLenTiny7(y_2)
-						data['Zm1'] = doLenTiny7(0)
-						data['Zm2'] = doLenTiny7(e_w)
-						data['Ch'] = doLenTiny7(b)
-						data['Fi'] = doLenTiny7(0)
+						data['ne'] = doLenTiny(-cur_ne, 3); cur_ne += 1
+						data['ni'] = doLenTiny(20, 3)
+						data['Xm'] = doLenTiny(x_2, 7)
+						data['Ym'] = doLenTiny(y_2, 7)
+						data['Zm1'] = doLenTiny(0, 7)
+						data['Zm2'] = doLenTiny(e_w, 7)
+						data['Ch'] = doLenTiny(b, 7)
+						data['Fi'] = doLenTiny(0, 7)
 
 						e_wing = WingBlock(data)
 						sumtext += e_wing.getText() + '\n'
@@ -177,14 +179,14 @@ if __name__ == '__main__':
 						#для первого крыла
 						data = dict()
 						data['name'] = 'first wing'
-						data['ne'] = doLenTiny3(cur_ne); cur_ne += 1
-						data['ni'] = doLenTiny3(20)
-						data['Xm'] = doLenTiny7(x_1)
-						data['Ym'] = doLenTiny7(y_1)
-						data['Zm1'] = doLenTiny7(0)
-						data['Zm2'] = doLenTiny7(f_wingspan)
-						data['Ch'] = doLenTiny7(b)
-						data['Fi'] = doLenTiny7(2)
+						data['ne'] = doLenTiny(cur_ne, 3); cur_ne += 1
+						data['ni'] = doLenTiny(20, 3)
+						data['Xm'] = doLenTiny(x_1, 7)
+						data['Ym'] = doLenTiny(y_1, 7)
+						data['Zm1'] = doLenTiny(0, 7)
+						data['Zm2'] = doLenTiny(f_wingspan, 7)
+						data['Ch'] = doLenTiny(b, 7)
+						data['Fi'] = doLenTiny(2, 7)
 
 						f_wing = WingBlock(data)
 						sumtext += f_wing.getText() + '\n'
@@ -192,22 +194,22 @@ if __name__ == '__main__':
 						#для второго крыла
 						data = dict()
 						data['name'] = 'second wing with deflected edge'
-						data['ne'] = doLenTiny3(-cur_ne); cur_ne += 2
-						data['ni'] = doLenTiny3(20)
-						data['Xm'] = doLenTiny7(x_2)
-						data['Ym'] = doLenTiny7(y_2)
-						data['Zm0'] = doLenTiny7(0)		
-						data['Zm1'] = doLenTiny7(e_w - f_wingspan*r_r/100) #отношение относительно переднего крыла
-						data['Zm2'] = doLenTiny7(e_w)
-						data['Ch'] = doLenTiny7(b)
-						data['Fi'] = doLenTiny7(0)
+						data['ne'] = doLenTiny(-cur_ne, 3); cur_ne += 2
+						data['ni'] = doLenTiny(20, 3)
+						data['Xm'] = doLenTiny(x_2, 7)
+						data['Ym'] = doLenTiny(y_2, 7)
+						data['Zm0'] = doLenTiny(0, 7)		
+						data['Zm1'] = doLenTiny(e_w - f_wingspan*r_r/100, 7) #отношение относительно переднего крыла
+						data['Zm2'] = doLenTiny(e_w, 7)
+						data['Ch'] = doLenTiny(b, 7)
+						data['Fi'] = doLenTiny(0, 7)
 
 						e_wing = WingBlock2(data)
 						sumtext += e_wing.getText() + '\n'
 
 					#Для последнего блока
 					data = dict()
-					data['Mach'] = doLenTiny7(Mach)
+					data['Mach'] = doLenTiny(Mach, 7)
 					endblock = EndBlock(data)
 					sumtext += endblock.getText() + '\n'
 
@@ -227,17 +229,8 @@ if __name__ == '__main__':
 						
 						proceses_data.append({'sumtext':sumtext, 'file_name':file_name, 'calc_count':calc_count})
 	
-	if os.path.exists(getProjectDir() + 'tools\\PANSYM\\Temp'):
-		shutil.rmtree(getProjectDir() + 'tools\\PANSYM\\Temp')				
-	
 	pool = multiprocessing.Pool()
-	pool.map(pansymWorker, proceses_data)	
+	pool.map(pansymWorker, proceses_data)
+	rmdir(getProjectDir() + 'tools\\PANSYM\\Temp')
 
-	print('Program finished in ' + str(round(time.clock() - BEFORE, 1)) + 's')
-
-	if os.path.exists(getProjectDir() + 'tools\\PANSYM\\Temp'):
-		shutil.rmtree(getProjectDir() + 'tools\\PANSYM\\Temp')				
-
-
-
-							
+	print('Program finished in ' + str(round(time.clock() - BEFORE, 1)) + 's')	

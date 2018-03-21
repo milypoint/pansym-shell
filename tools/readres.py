@@ -1,23 +1,13 @@
-import os
 from os import listdir
 from os.path import isfile, join
-import re #Регулярные выражения для работы со строковыми шаблонами
+import re
 import glob
-from rotate_foilpoints import *
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import groupby
 from operator import itemgetter
 
-def iprint(data, split=False):
-	for item in data:
-		print(item)
-		if split:
-			print()
-
-def mkdir(dir_name):
-	if not os.path.exists(dir_name):
-		os.makedirs(dir_name)
+from utilities import *
 
 def fileNameDecode(fname):
 	'''
